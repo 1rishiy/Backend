@@ -1,0 +1,47 @@
+CREATE TABLE IF NOT EXISTS users (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    role VARCHAR(50) DEFAULT 'user',
+    avatar_url TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS courses (
+    id SERIAL PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    description TEXT,
+    instructor_id INTEGER REFERENCES users(id),
+    price DECIMAL(10, 2) DEFAULT 0.00,
+    category VARCHAR(100),
+    level VARCHAR(50),
+    image_url TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS lessons (
+    id SERIAL PRIMARY KEY,
+    course_id INTEGER REFERENCES courses(id) ON DELETE CASCADE,
+    title VARCHAR(255) NOT NULL,
+    duration_mins INTEGER DEFAULT 0,
+    order_num INTEGER NOT NULL,
+    video_url TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS enrollments (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    course_id INTEGER REFERENCES courses(id) ON DELETE CASCADE,
+    enrolled_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(user_id, course_id)
+);
+
+CREATE TABLE IF NOT EXISTS lesson_progress (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    lesson_id INTEGER REFERENCES lessons(id) ON DELETE CASCADE,
+    completed_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(user_id, lesson_id)
+);
